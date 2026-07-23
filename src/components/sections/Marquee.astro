@@ -1,0 +1,14 @@
+---
+import { marqueeItems } from '@/data/marquee';
+const track = [...marqueeItems, ...marqueeItems];
+---
+<section class="group border-t border-b border-white/[.08] overflow-hidden bg-white/[.02] py-[1.4rem]">
+  <div class="marquee-track flex w-max gap-x-[1.6rem] pr-[1.6rem] group-hover:[animation-play-state:paused]">
+    {track.map((item) => (
+      <span class="inline-flex items-center gap-[.6rem] font-heading font-bold text-[clamp(.95rem,1.4vw,1.15rem)] text-white/[.85] whitespace-nowrap">
+        <span class="text-[#b7a6ff]">◆</span>
+        {item}
+      </span>
+    ))}
+  </div>
+</section>

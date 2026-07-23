@@ -1,0 +1,159 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Contact from '@/components/sections/Contact.astro';
+import { services } from '@/data/services';
+import { serviceAreas, serviceBrands } from '@/data/coverage';
+import { phoneHref } from '@/data/nav';
+
+export function getStaticPaths() {
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const siteUrl = 'https://mlightning-custom.fr';
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Accueil', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'Services', item: `${siteUrl}/#services` },
+    { '@type': 'ListItem', position: 3, name: service.name, item: `${siteUrl}/services/${service.slug}` },
+  ],
+};
+
+const stats = [
+  { label: 'À partir de', value: service.price },
+  { label: 'Durée', value: service.duration },
+  { label: 'Garantie', value: service.warranty },
+];
+---
+<BaseLayout
+  title={service.name}
+  description={service.metaDescription}
+  canonicalPath={`/services/${service.slug}`}
+  ogImage={service.heroImage}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-content mx-auto px-6 pt-[clamp(2.5rem,5vw,4.5rem)]">
+    <a href="/#services" class="text-white/50 hover:text-white text-[.9rem] inline-flex items-center gap-2">← Toutes les prestations</a>
+  </div>
+
+  <section class="max-w-content mx-auto px-6 pt-6 pb-8">
+    <div class="grid grid-cols-1 min-[901px]:grid-cols-2 gap-[clamp(2rem,4vw,3.5rem)] items-center">
+      <div class="reveal">
+        <span class="inline-flex items-center gap-[.55rem] px-4 py-2 rounded-pill border border-white/[.16] bg-white/[.04] text-[.78rem] font-bold uppercase tracking-[.08em] text-white/80">
+          {service.kicker}
+        </span>
+        <h1 class="text-[clamp(2.4rem,5.5vw,4.2rem)] mt-[1.3rem] tracking-[-.02em]">{service.name}</h1>
+        <p class="text-white/70 text-[clamp(1.05rem,1.5vw,1.25rem)] max-w-[48ch] mt-[1.3rem] leading-[1.6]">{service.desc}</p>
+
+        <div class="flex flex-wrap gap-[.8rem] mt-[1.8rem]">
+          {stats.map((stat) => (
+            <div class="px-[1.1rem] py-[.75rem] rounded-2xl border border-white/[.12] bg-white/[.03]">
+              <div class="text-[.72rem] uppercase tracking-[.1em] text-white/45">{stat.label}</div>
+              <div class="font-heading font-extrabold text-[1.5rem] holo-text">{stat.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div class="flex flex-wrap gap-[.9rem] mt-8">
+          <a href="#contact" class="btn-holo">Demander un devis gratuit</a>
+          <a href={phoneHref} class="btn-outline">📞 Nous appeler</a>
+        </div>
+      </div>
+
+      <div class="reveal relative aspect-[4/5] rounded-[26px] overflow-hidden border border-white/10" style="transition-delay:100ms">
+        <img
+          src={service.heroImage}
+          alt={service.name}
+          class="no-drag absolute inset-0 w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(180deg, transparent 50%, rgba(7,7,12,.72));"></div>
+        <div class="absolute left-[1.3rem] bottom-[1.3rem] text-[.82rem] font-semibold text-white/85">✦ {service.name} · Mlightning</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-content mx-auto px-6 py-[clamp(2rem,4vw,4rem)]">
+    <div class="reveal">
+      <span class="holo-text uppercase tracking-[.14em] text-[.8rem] font-bold block">Ce qui est inclus</span>
+      <h2 class="text-[clamp(1.8rem,3.6vw,2.8rem)] mt-[.8rem] max-w-[20ch]">La prestation en détail</h2>
+    </div>
+
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-[.9rem] mt-8">
+      {service.features.map((feature, i) => (
+        <div class="reveal flex items-start gap-[.85rem] p-[1.1rem_1.2rem] border border-white/10 rounded-2xl bg-white/[.02]" style={`transition-delay:${i * 60}ms`}>
+          <span class="w-6 h-6 rounded-[7px] flex-shrink-0 flex items-center justify-center text-[.8rem] font-extrabold text-bg mt-[.1rem]" style="background-image: var(--holo-gradient);" aria-hidden="true">✓</span>
+          <div>
+            <div class="font-bold text-[.98rem]">{feature.t}</div>
+            <div class="text-[.86rem] text-white/55 mt-[.2rem] leading-[1.45]">{feature.d}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="max-w-content mx-auto px-6 pt-[clamp(1rem,2vw,2rem)] pb-[clamp(2rem,4vw,4rem)]">
+    <div class="grid grid-cols-2 min-[640px]:grid-cols-3 gap-4">
+      {service.gallery.map((src, i) => (
+        <div class="reveal relative aspect-square rounded-2xl overflow-hidden border border-white/10" style={`transition-delay:${i * 60}ms`}>
+          <img src={src} alt={`${service.name} — réalisation ${i + 1}`} loading="lazy" class="no-drag absolute inset-0 w-full h-full object-cover" />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="border-t border-white/[.08] bg-white/[.02]">
+    <div class="max-w-content mx-auto px-6 py-[clamp(3rem,5vw,5rem)]">
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
+        {service.benefits.map((benefit, i) => (
+          <div class="reveal p-[1.8rem] border border-white/10 rounded-2xl bg-white/[.02]" style={`transition-delay:${i * 80}ms`}>
+            <div class="font-heading font-extrabold text-[2rem] holo-text">{benefit.n}</div>
+            <h3 class="text-[1.2rem] mt-[.6rem] mb-[.5rem]">{benefit.t}</h3>
+            <p class="text-white/60 text-[.92rem] leading-[1.55]">{benefit.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-content mx-auto px-6 py-[clamp(2rem,4vw,4rem)]">
+    <div class="reveal">
+      <span class="holo-text uppercase tracking-[.14em] text-[.8rem] font-bold block">Où et sur quels véhicules</span>
+      <h2 class="text-[clamp(1.6rem,3vw,2.2rem)] mt-[.8rem] max-w-[28ch]">{service.name} : toutes marques, tout le Val-d'Oise</h2>
+      <p class="text-white/60 text-[.95rem] max-w-[68ch] mt-[.9rem] leading-[1.6]">
+        Nous installons {service.name.toLowerCase()} sur toutes les marques — Audi, Mercedes-Benz, Volkswagen, BMW, Peugeot, Renault, Citroën, Ford et bien d'autres. Basés à Persan, nous intervenons dans tout le Val-d'Oise (95) et les villes limitrophes de l'Oise, ainsi que ponctuellement en Guadeloupe sur rendez-vous.
+      </p>
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-[.55rem]">
+      {serviceBrands.map((brand) => (
+        <span class="px-[.9rem] py-[.45rem] rounded-pill border border-white/[.12] bg-white/[.03] text-[.82rem] font-semibold text-white/75">{brand}</span>
+      ))}
+    </div>
+
+    <div class="mt-4 flex flex-wrap gap-[.55rem]">
+      {[...serviceAreas.valdoise, ...serviceAreas.oise].map((city) => (
+        <span class="px-[.85rem] py-[.4rem] rounded-pill border border-white/[.08] bg-white/[.015] text-[.78rem] text-white/55">{city}</span>
+      ))}
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-[.55rem]">
+      <span class="text-[.78rem] text-white/40 font-semibold uppercase tracking-[.06em]">Guadeloupe (sur rendez-vous)</span>
+      {serviceAreas.guadeloupe.map((city) => (
+        <span class="px-[.85rem] py-[.4rem] rounded-pill border border-white/[.08] bg-white/[.015] text-[.78rem] text-white/55">{city}</span>
+      ))}
+    </div>
+  </section>
+
+  <Contact
+    title={`Un projet ${service.name} ?`}
+    description="Devis gratuit et conseils personnalisés selon votre véhicule. On répond généralement sous 24h."
+    defaultPrestation={service.name}
+  />
+</BaseLayout>

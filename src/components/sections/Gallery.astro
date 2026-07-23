@@ -1,0 +1,171 @@
+---
+import { gallery } from '@/data/gallery';
+
+const spanClass: Record<string, string> = {
+  big: 'col-span-2 row-span-2 max-[640px]:col-span-1 max-[640px]:row-span-1',
+  tall: 'row-span-2 max-[640px]:row-span-1',
+  wide: 'col-span-2 max-[640px]:col-span-1',
+  normal: '',
+};
+---
+<section id="realisations" class="max-w-content mx-auto px-6 py-section">
+  <div class="reveal text-center max-w-[44ch] mx-auto mb-12">
+    <span class="holo-text uppercase tracking-[.14em] text-[.8rem] font-bold block">Réalisations</span>
+    <h2 class="text-[clamp(2rem,4.4vw,3.4rem)] mt-[.9rem]">Nos dernières créations</h2>
+    <p class="text-white/60 mt-4 leading-[1.6]">Un aperçu de nos derniers projets, réalisés chez nos clients.</p>
+  </div>
+
+  <div data-gallery-grid class="grid grid-cols-4 max-[640px]:grid-cols-2 auto-rows-[200px] gap-4 grid-flow-dense">
+    {gallery.map((item, i) => (
+      <div class={`reveal h-full ${spanClass[item.span]}`} style={`transition-delay:${i * 60}ms`}>
+        <button
+          type="button"
+          data-gallery-item
+          data-index={i}
+          data-type={item.type}
+          data-src={item.src}
+          data-poster={item.poster ?? ''}
+          data-alt={item.alt}
+          aria-label="Agrandir"
+          class="group relative m-0 block w-full h-full overflow-hidden rounded-[18px] border border-white/10 cursor-zoom-in"
+        >
+          {item.type === 'video' ? (
+            <video
+              data-gallery-video
+              src={item.src}
+              poster={item.poster}
+              aria-label={item.alt}
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              class="no-drag absolute inset-0 w-full h-full object-cover"
+            ></video>
+          ) : (
+            <img
+              src={item.src}
+              alt={item.alt}
+              loading="lazy"
+              class="no-drag absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+          <span class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity text-white text-2xl">⤢</span>
+          </span>
+        </button>
+      </div>
+    ))}
+  </div>
+
+  <div
+    data-lightbox
+    class="hidden fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-6"
+  >
+    <button data-lightbox-close aria-label="Fermer" class="absolute top-6 right-6 w-11 h-11 rounded-[10px] border border-white/[.14] bg-white/[.06] text-white text-xl">✕</button>
+    <button data-lightbox-prev aria-label="Précédent" class="absolute left-4 max-[640px]:left-2 w-11 h-11 rounded-full border border-white/[.14] bg-white/[.06] text-white text-xl">‹</button>
+    <button data-lightbox-next aria-label="Suivant" class="absolute right-4 max-[640px]:right-2 w-11 h-11 rounded-full border border-white/[.14] bg-white/[.06] text-white text-xl">›</button>
+    <div data-lightbox-content class="relative max-w-5xl w-full flex items-center justify-center"></div>
+  </div>
+</section>
+
+<script>
+  // Vidéos de la grille : ne jouent que lorsqu'elles sont réellement visibles
+  // à l'écran (remplace GalleryVideo/IntersectionObserver de Gallery.tsx).
+  const gridVideos = document.querySelectorAll<HTMLVideoElement>('[data-gallery-video]');
+  const gridObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const video = entry.target as HTMLVideoElement;
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      }
+    },
+    { threshold: 0.4 }
+  );
+  gridVideos.forEach((v) => gridObserver.observe(v));
+
+  // Lightbox : ouverture au clic sur une tuile, navigation clavier/flèches.
+  type Item = { type: string; src: string; poster: string; alt: string };
+
+  const items: Item[] = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-gallery-item]')).map((btn) => ({
+    type: btn.dataset.type ?? 'image',
+    src: btn.dataset.src ?? '',
+    poster: btn.dataset.poster ?? '',
+    alt: btn.dataset.alt ?? '',
+  }));
+
+  const lightbox = document.querySelector<HTMLElement>('[data-lightbox]');
+  const lightboxContent = lightbox?.querySelector<HTMLElement>('[data-lightbox-content]');
+  let activeIndex: number | null = null;
+
+  function render() {
+    if (activeIndex === null || !lightboxContent) return;
+    const item = items[activeIndex];
+    lightboxContent.innerHTML = '';
+
+    if (item.type === 'video') {
+      const video = document.createElement('video');
+      video.src = item.src;
+      if (item.poster) video.poster = item.poster;
+      video.setAttribute('aria-label', item.alt);
+      video.controls = true;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.className = 'no-drag max-w-full max-h-[85vh] w-auto h-auto rounded-xl';
+      lightboxContent.appendChild(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = item.alt;
+      img.draggable = false;
+      img.className = 'no-drag max-w-full max-h-[85vh] w-auto h-auto object-contain rounded-xl';
+      lightboxContent.appendChild(img);
+    }
+  }
+
+  function open(index: number) {
+    activeIndex = index;
+    render();
+    lightbox?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    activeIndex = null;
+    if (lightboxContent) lightboxContent.innerHTML = '';
+    lightbox?.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function showPrev() {
+    if (activeIndex === null) return;
+    activeIndex = (activeIndex - 1 + items.length) % items.length;
+    render();
+  }
+
+  function showNext() {
+    if (activeIndex === null) return;
+    activeIndex = (activeIndex + 1) % items.length;
+    render();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((btn) => {
+    btn.addEventListener('click', () => open(Number(btn.dataset.index)));
+  });
+
+  lightbox?.querySelector('[data-lightbox-close]')?.addEventListener('click', close);
+  lightbox?.querySelector('[data-lightbox-prev]')?.addEventListener('click', showPrev);
+  lightbox?.querySelector('[data-lightbox-next]')?.addEventListener('click', showNext);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) close();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (activeIndex === null) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') showPrev();
+    if (e.key === 'ArrowRight') showNext();
+  });
+</script>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Marquee from '@/components/sections/Marquee.astro';
+import Services from '@/components/sections/Services.astro';
+import Gallery from '@/components/sections/Gallery.astro';
+import Process from '@/components/sections/Process.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import Contact from '@/components/sections/Contact.astro';
+import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema.astro';
+---
+<BaseLayout canonicalPath="/">
+  <link slot="head" rel="preload" as="image" href="/images/carousel3.webp" fetchpriority="high" />
+  <LocalBusinessSchema />
+  <Hero />
+  <Marquee />
+  <Services />
+  <Gallery />
+  <Process />
+  <Testimonials />
+  <Contact />
+</BaseLayout>

@@ -1,0 +1,40 @@
+export const serviceBrands = [
+  'Audi',
+  'Mercedes-Benz',
+  'Volkswagen',
+  'BMW',
+  'Peugeot',
+  'Renault',
+  'Citroën',
+  'Ford',
+];
+
+export const serviceAreas = {
+  valdoise: [
+    'Persan',
+    'Beaumont-sur-Oise',
+    "L'Isle-Adam",
+    'Chambly',
+    'Bernes-sur-Oise',
+    'Taverny',
+    'Franconville',
+    'Herblay',
+    'Argenteuil',
+    'Eaubonne',
+    "Saint-Ouen-l'Aumône",
+    'Gonesse',
+    'Goussainville',
+    'Cormeilles-en-Parisis',
+  ],
+  oise: ['Chantilly', 'Compiègne', 'Beauvais', 'Senlis'],
+  guadeloupe: [
+    'Pointe-à-Pitre',
+    'Les Abymes',
+    'Baie-Mahault',
+    'Le Gosier',
+    'Sainte-Anne',
+    'Le Moule',
+    'Saint-François',
+    'Basse-Terre',
+  ],
+};

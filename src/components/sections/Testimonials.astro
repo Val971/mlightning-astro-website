@@ -1,0 +1,55 @@
+---
+// Avis Google récupérés côté serveur au moment du build (site statique) —
+// voir src/lib/googleReviews.ts. Sans clé API configurée, on retombe sur les
+// avis statiques de secours (src/data/testimonials.ts), comme dans la
+// version Next.js.
+import { testimonials as staticTestimonials } from '@/data/testimonials';
+import { getGoogleReviews } from '@/lib/googleReviews';
+import { googleReviewsUrl } from '@/data/business';
+
+const google = await getGoogleReviews();
+const hasGoogleReviews = !!google && google.reviews.length > 0;
+
+const items = hasGoogleReviews
+  ? google!.reviews.map((r) => ({ quote: r.text, name: r.authorName, car: undefined as string | undefined, rating: r.rating }))
+  : staticTestimonials.map((t) => ({ ...t, rating: 5 }));
+
+const reviewsLink = google?.mapsUri ?? googleReviewsUrl;
+---
+<section id="avis" class="max-w-content mx-auto px-6 py-section">
+  <div class="reveal text-center mb-12">
+    <span class="holo-text uppercase tracking-[.14em] text-[.8rem] font-bold block">Ils nous ont fait confiance</span>
+    <h2 class="text-[clamp(2rem,4.4vw,3.4rem)] mt-[.9rem]">Des clients conquis</h2>
+    {hasGoogleReviews && (
+      <p class="text-white/60 mt-4">
+        <span class="holo-text font-heading font-bold">{google!.rating.toFixed(1)}/5</span> sur {google!.userRatingCount} avis Google
+      </p>
+    )}
+  </div>
+
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-[1.2rem]">
+    {items.map((t, i) => (
+      <div class="reveal h-full" style={`transition-delay:${i * 80}ms`}>
+        <figure class="h-full m-0 p-8 border border-white/10 rounded-[20px] bg-white/[.03] flex flex-col gap-[1.1rem]">
+          <div class="holo-text text-[1.1rem] tracking-[.15em]">
+            {'★'.repeat(t.rating)}{'☆'.repeat(Math.max(0, 5 - t.rating))}
+          </div>
+          <blockquote class="m-0 text-[1.05rem] leading-[1.6] text-white/90">&ldquo;{t.quote}&rdquo;</blockquote>
+          <figcaption class="mt-auto text-[.9rem]">
+            <span class="font-bold text-white">{t.name}</span>
+            {t.car && (<><br /><span class="text-white/50">{t.car}</span></>)}
+          </figcaption>
+        </figure>
+      </div>
+    ))}
+  </div>
+
+  <div class="reveal text-center mt-10" style={`transition-delay:${items.length * 80}ms`}>
+    <p class="text-white/60">
+      Envie de lire plus d'avis ?{' '}
+      <a href={reviewsLink} target="_blank" rel="noopener noreferrer" class="text-white underline hover:text-white/70">
+        Découvrez tous nos avis sur Google →
+      </a>
+    </p>
+  </div>
+</section>

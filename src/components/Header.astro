@@ -1,0 +1,215 @@
+---
+import { navLinks } from '@/data/nav';
+import { services } from '@/data/services';
+---
+<header class="sticky top-0 z-[60] backdrop-blur-[14px] bg-[rgba(7,7,12,.72)] border-b border-white/[.08]">
+  <nav class="max-w-content mx-auto px-6 py-[.85rem] flex items-center gap-8 justify-between">
+    <a href="/#top" class="flex items-center">
+      <img
+        src="/images/logo-holo-cropped.webp"
+        alt="Mlightning Custom"
+        height="68"
+        width="121"
+        fetchpriority="high"
+        class="h-[68px] w-auto drop-shadow-[0_0_16px_rgba(183,166,255,.4)]"
+      />
+    </a>
+
+    <div class="ml-auto max-[900px]:hidden flex items-center gap-[1.9rem] text-[.95rem] font-semibold text-white/[.82]">
+      {navLinks.map((link) =>
+        link.label === 'Services' ? (
+          <div data-services-dropdown class="relative">
+            <button
+              type="button"
+              data-services-trigger
+              aria-expanded="false"
+              class="flex items-center gap-[.35rem] text-white/[.82] hover:text-white cursor-pointer"
+            >
+              Services
+              <span data-services-arrow class="text-[.7rem] transition-transform" aria-hidden="true">▾</span>
+            </button>
+
+            <div
+              data-services-panel
+              class="hidden absolute top-[calc(100%+.9rem)] left-1/2 -translate-x-1/2 w-[280px] rounded-2xl border border-white/[.12] bg-[#0d0d16] shadow-[0_20px_50px_-12px_rgba(0,0,0,.6)] p-2 flex flex-col"
+            >
+              {services.map((service) => (
+                <a
+                  href={`/services/${service.slug}`}
+                  class="px-3 py-[.65rem] rounded-xl text-[.9rem] font-semibold text-white/80 hover:text-white hover:bg-white/[.06]"
+                >
+                  {service.label}
+                </a>
+              ))}
+              <a
+                href="/#services"
+                class="mt-1 px-3 py-[.65rem] rounded-xl text-[.85rem] font-semibold text-white/50 hover:text-white hover:bg-white/[.06] border-t border-white/[.08]"
+              >
+                Voir tous les services →
+              </a>
+            </div>
+          </div>
+        ) : (
+          <a href={link.href} class="text-white/[.82] hover:text-white">{link.label}</a>
+        )
+      )}
+    </div>
+
+    <a href="/#contact" class="btn-holo max-[900px]:hidden">Prendre rendez-vous</a>
+
+    <button
+      data-mobile-menu-open
+      aria-label="Menu"
+      class="hidden max-[900px]:inline-flex items-center justify-center bg-white/[.06] border border-white/[.14] rounded-[10px] w-11 h-11 cursor-pointer text-white text-xl"
+    >
+      ☰
+    </button>
+  </nav>
+</header>
+
+<div data-mobile-menu class="fixed inset-0 z-[90] opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true">
+  <div data-mobile-menu-backdrop class="mobile-menu-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+  <div
+    data-mobile-menu-panel
+    class="mobile-menu-panel absolute top-0 right-0 h-full w-[82vw] max-w-[360px] bg-bg border-l border-white/[.1] p-6 flex flex-col gap-6 shadow-[0_0_40px_rgba(0,0,0,.6)] transition-transform duration-300 translate-x-full"
+    style="background-color:#07070c"
+  >
+    <div class="flex justify-between items-center">
+      <img
+        src="/images/logo-holo-cropped.webp"
+        alt="Mlightning Custom"
+        height="48"
+        width="85"
+        class="h-12 w-auto drop-shadow-[0_0_16px_rgba(183,166,255,.4)]"
+      />
+      <button
+        data-mobile-menu-close
+        aria-label="Fermer le menu"
+        class="w-11 h-11 rounded-[10px] border border-white/[.14] bg-white/[.06] text-white text-xl"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-5 overflow-y-auto">
+      {navLinks.map((link) =>
+        link.label === 'Services' ? (
+          <div>
+            <button
+              type="button"
+              data-mobile-services-trigger
+              aria-expanded="false"
+              class="font-heading font-extrabold text-[1.7rem] text-white flex items-center gap-3"
+            >
+              Services
+              <span data-mobile-services-arrow class="text-[1rem] transition-transform" aria-hidden="true">▾</span>
+            </button>
+
+            <div data-mobile-services-panel class="hidden mt-3 flex flex-col gap-3 pl-2 border-l border-white/[.14]">
+              {services.map((service) => (
+                <a
+                  href={`/services/${service.slug}`}
+                  data-mobile-menu-link
+                  class="text-[1.05rem] font-semibold text-white/70 hover:text-white pl-3"
+                >
+                  {service.label}
+                </a>
+              ))}
+              <a href="/#services" data-mobile-menu-link class="text-[.95rem] font-semibold text-white/45 hover:text-white pl-3">
+                Voir tous les services →
+              </a>
+            </div>
+          </div>
+        ) : (
+          <a href={link.href} data-mobile-menu-link class="font-heading font-extrabold text-[1.7rem] text-white">
+            {link.label}
+          </a>
+        )
+      )}
+    </div>
+
+    <a href="/#contact" data-mobile-menu-link class="btn-holo mt-auto text-center justify-center">Prendre rendez-vous</a>
+  </div>
+</div>
+
+<script>
+  // Sous-menu "Services" desktop : ouverture/fermeture au clic, fermeture au
+  // clic extérieur ou Échap (remplace le useState de Header.tsx).
+  const dropdown = document.querySelector<HTMLElement>('[data-services-dropdown]');
+  const trigger = dropdown?.querySelector<HTMLButtonElement>('[data-services-trigger]');
+  const panel = dropdown?.querySelector<HTMLElement>('[data-services-panel]');
+  const arrow = dropdown?.querySelector<HTMLElement>('[data-services-arrow]');
+
+  function closeDesktopServices() {
+    panel?.classList.add('hidden');
+    arrow?.classList.remove('rotate-180');
+    trigger?.setAttribute('aria-expanded', 'false');
+  }
+
+  trigger?.addEventListener('click', () => {
+    const isOpen = !panel?.classList.contains('hidden');
+    if (isOpen) {
+      closeDesktopServices();
+    } else {
+      panel?.classList.remove('hidden');
+      arrow?.classList.add('rotate-180');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (dropdown && !dropdown.contains(e.target as Node)) closeDesktopServices();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDesktopServices();
+  });
+
+  // Menu mobile (drawer) : ouverture/fermeture + sous-menu Services imbriqué
+  // (remplace MobileMenu.tsx).
+  const mobileMenu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+  const mobileMenuPanel = mobileMenu?.querySelector<HTMLElement>('[data-mobile-menu-panel]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-mobile-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-mobile-menu-close]');
+  const backdrop = mobileMenu?.querySelector<HTMLElement>('[data-mobile-menu-backdrop]');
+  const mobileServicesTrigger = mobileMenu?.querySelector<HTMLButtonElement>('[data-mobile-services-trigger]');
+  const mobileServicesPanel = mobileMenu?.querySelector<HTMLElement>('[data-mobile-services-panel]');
+  const mobileServicesArrow = mobileMenu?.querySelector<HTMLElement>('[data-mobile-services-arrow]');
+  const mobileLinks = mobileMenu?.querySelectorAll<HTMLAnchorElement>('[data-mobile-menu-link]');
+
+  function openMobileMenu() {
+    mobileMenu?.classList.remove('opacity-0', 'pointer-events-none');
+    mobileMenu?.classList.add('opacity-100', 'pointer-events-auto');
+    mobileMenu?.setAttribute('aria-hidden', 'false');
+    mobileMenuPanel?.classList.remove('translate-x-full');
+    mobileMenuPanel?.classList.add('translate-x-0');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileMenu() {
+    mobileMenu?.classList.add('opacity-0', 'pointer-events-none');
+    mobileMenu?.classList.remove('opacity-100', 'pointer-events-auto');
+    mobileMenu?.setAttribute('aria-hidden', 'true');
+    mobileMenuPanel?.classList.add('translate-x-full');
+    mobileMenuPanel?.classList.remove('translate-x-0');
+    document.body.style.overflow = '';
+    mobileServicesPanel?.classList.add('hidden');
+    mobileServicesArrow?.classList.remove('rotate-180');
+  }
+
+  openBtn?.addEventListener('click', openMobileMenu);
+  closeBtn?.addEventListener('click', closeMobileMenu);
+  backdrop?.addEventListener('click', closeMobileMenu);
+  mobileLinks?.forEach((link) => link.addEventListener('click', closeMobileMenu));
+
+  mobileServicesTrigger?.addEventListener('click', () => {
+    const isOpen = !mobileServicesPanel?.classList.contains('hidden');
+    if (isOpen) {
+      mobileServicesPanel?.classList.add('hidden');
+      mobileServicesArrow?.classList.remove('rotate-180');
+    } else {
+      mobileServicesPanel?.classList.remove('hidden');
+      mobileServicesArrow?.classList.add('rotate-180');
+    }
+  });
+</script>

@@ -1,0 +1,141 @@
+---
+import '@fontsource-variable/syne';
+import '@fontsource-variable/manrope';
+import '../styles/global.css';
+import GlowBackdrop from '@/components/ui/GlowBackdrop.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import WhatsappFloatButton from '@/components/ui/WhatsappFloatButton.astro';
+
+export type Props = {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+  ogImage?: string;
+  noindex?: boolean;
+};
+
+const siteUrl = 'https://mlightning-custom.fr';
+const siteName = 'Mlightning Custom';
+const defaultDescription =
+  "Customisation intérieur auto à Persan (95) : LED d'ambiance, ciel étoilé, Apple CarPlay, volants sur-mesure, vitres teintées. Devis gratuit, réponse sous 24h.";
+
+const {
+  title,
+  description = defaultDescription,
+  canonicalPath = '/',
+  ogImage = '/images/og-image.jpg',
+  noindex = false,
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${siteName}` : `${siteName} — Customisation intérieur voiture à Persan (95)`;
+const canonicalUrl = new URL(canonicalPath, siteUrl).toString();
+const ogImageUrl = new URL(ogImage, siteUrl).toString();
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={siteName} />
+    <meta
+      name="keywords"
+      content="customisation intérieur voiture, LED d'ambiance voiture, ciel étoilé voiture, Apple CarPlay installation, volant sur-mesure, vitres teintées, personnalisation intérieur automobile, Persan, Val-d'Oise, Guadeloupe, customisation intérieur voiture Guadeloupe, LED d'ambiance voiture Guadeloupe, ciel étoilé voiture Guadeloupe, Apple CarPlay Guadeloupe, Pointe-à-Pitre, Les Abymes, Baie-Mahault"
+    />
+    {noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <meta name="robots" content="index, follow" />
+    )}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <slot name="head" />
+  </head>
+  <body class="font-body bg-bg text-white relative">
+    <GlowBackdrop />
+    <div class="relative z-10">
+      <Header />
+      <slot />
+      <Footer />
+    </div>
+    <WhatsappFloatButton />
+
+    <script>
+      // Apparition au scroll pour tout élément .reveal (remplace le composant
+      // React Reveal — un seul observateur pour toute la page, zéro JS
+      // framework envoyé).
+      const revealEls = document.querySelectorAll<HTMLElement>('.reveal');
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('reveal-in');
+              revealObserver.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      );
+      revealEls.forEach((el) => revealObserver.observe(el));
+
+      // Compteurs animés (remplace AnimatedStat) : parse "6 ans+", "200+",
+      // "< 24 h" en { prefix, target, suffix } et anime jusqu'à la cible une
+      // fois l'élément visible.
+      function parseValue(raw: string) {
+        const match = raw.match(/^(\D*)(\d+)(.*)$/);
+        if (!match) return null;
+        const [, prefix, numStr, suffix] = match;
+        return { prefix, target: parseInt(numStr, 10), suffix };
+      }
+
+      const statEls = document.querySelectorAll<HTMLElement>('[data-animated-stat]');
+      const statObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            const raw = el.dataset.value ?? '';
+            const parsed = parseValue(raw);
+            statObserver.unobserve(el);
+            if (!parsed) {
+              el.textContent = raw;
+              continue;
+            }
+            const { prefix, target, suffix } = parsed;
+            const duration = 1200;
+            const start = performance.now();
+            const tick = (now: number) => {
+              const progress = Math.min((now - start) / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+              el.textContent = `${prefix}${Math.round(eased * target)}${suffix}`;
+              if (progress < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          }
+        },
+        { threshold: 0.4 }
+      );
+      statEls.forEach((el) => statObserver.observe(el));
+    </script>
+  </body>
+</html>

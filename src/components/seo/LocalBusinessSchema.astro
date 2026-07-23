@@ -1,0 +1,62 @@
+---
+import { address, openingHours } from '@/data/business';
+import { phoneHref } from '@/data/nav';
+import { socials } from '@/data/socials';
+import { serviceAreas } from '@/data/coverage';
+import { getGoogleReviews } from '@/lib/googleReviews';
+
+const siteUrl = 'https://mlightning-custom.fr';
+
+const [streetAddress] = address.lines;
+const postalMatch = address.lines[1]?.match(/^(\d{4,5})\s+(.+)$/);
+const postalCode = postalMatch?.[1] ?? '';
+const addressLocality = postalMatch?.[2] ?? address.lines[1] ?? '';
+
+const telephone = phoneHref.replace('tel:', '');
+
+const hoursMatch = openingHours.hours.match(/(\d{1,2})h\D+(\d{1,2})h/);
+const opens = hoursMatch ? `${hoursMatch[1].padStart(2, '0')}:00` : '11:00';
+const closes = hoursMatch ? `${hoursMatch[2].padStart(2, '0')}:00` : '19:00';
+
+const google = await getGoogleReviews();
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'AutomotiveBusiness',
+  '@id': `${siteUrl}/#business`,
+  name: 'Mlightning Custom',
+  image: `${siteUrl}/images/og-image.jpg`,
+  logo: `${siteUrl}/images/logo-holo-cropped.png`,
+  url: siteUrl,
+  telephone,
+  priceRange: '€€',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress,
+    postalCode,
+    addressLocality,
+    addressCountry: 'FR',
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens,
+    closes,
+  },
+  sameAs: socials.map((s) => s.url),
+  areaServed: [...serviceAreas.valdoise, ...serviceAreas.oise, ...serviceAreas.guadeloupe].map((city) => ({
+    '@type': 'City',
+    name: city,
+  })),
+  ...(google && google.userRatingCount > 0
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: google.rating,
+          reviewCount: google.userRatingCount,
+        },
+      }
+    : {}),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

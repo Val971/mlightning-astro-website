@@ -1,0 +1,67 @@
+---
+import Button from '@/components/ui/Button.astro';
+import { stats } from '@/data/stats';
+---
+<section id="top" class="relative min-h-[92vh] max-[900px]:min-h-[100svh] flex items-center overflow-hidden">
+  <div class="absolute inset-0 -z-10 bg-[#07070c]">
+    <video
+      class="absolute inset-0 w-full h-full object-cover no-drag"
+      src="/videos/videoPlayer2.mp4"
+      poster="/images/carousel3.webp"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      fetchpriority="high"
+      aria-label="Réalisation Mlightning Custom en vidéo"
+      controlslist="nodownload noremoteplayback"
+      disablepictureinpicture
+    ></video>
+    <div
+      class="absolute inset-0"
+      style="background: linear-gradient(180deg, rgba(7,7,12,.1) 0%, rgba(7,7,12,.25) 55%, rgba(7,7,12,.65) 100%);"
+    ></div>
+    <div
+      class="absolute inset-0 max-[900px]:hidden"
+      style="background: linear-gradient(90deg, rgba(7,7,12,.5) 0%, rgba(7,7,12,.08) 55%, transparent 100%);"
+    ></div>
+  </div>
+
+  <div class="max-w-content mx-auto px-6 py-[clamp(4rem,10vw,7rem)] w-full">
+    <div class="max-w-[56ch]" style="text-shadow: 0 2px 20px rgba(0,0,0,.55);">
+      <span
+        class="animate-fade-up inline-flex items-center gap-[.55rem] px-4 py-2 rounded-pill border border-white/[.16] bg-white/[.06] backdrop-blur-[6px] text-[.8rem] font-semibold uppercase tracking-[.06em] text-white/80"
+        style="animation-delay: 0s;"
+      >
+        <span class="w-[7px] h-[7px] rounded-full bg-[#7dd3fc]" style="box-shadow: 0 0 10px #7dd3fc;"></span>
+        Customisation auto · Région parisienne
+      </span>
+
+      <h1 class="animate-fade-up text-[clamp(2.7rem,6.5vw,5.4rem)] mt-6 tracking-[-.02em]" style="animation-delay: .1s;">
+        Votre habitacle,<br />
+        <span class="holo-text">réinventé.</span>
+      </h1>
+
+      <p class="animate-fade-up text-[clamp(1.05rem,1.5vw,1.28rem)] text-white/80 max-w-[50ch] mt-6 leading-[1.6]" style="animation-delay: .2s;">
+        LED d'ambiance, ciel étoilé, CarPlay, volants sur-mesure. On transforme l'intérieur de votre voiture en pièce unique — pensée dans le moindre détail.
+      </p>
+
+      <div class="animate-fade-up flex flex-wrap gap-[.9rem] mt-[2.2rem]" style="animation-delay: .3s;">
+        <Button href="/#contact">Prendre rendez-vous</Button>
+        <Button href="#services" variant="outline">Voir nos services</Button>
+      </div>
+
+      <div class="animate-fade-up flex flex-wrap gap-8 mt-[2.6rem]" style="animation-delay: .4s;">
+        {stats.map((s) => (
+          <div>
+            <div data-animated-stat data-value={s.value} class="holo-text font-heading font-extrabold text-[1.9rem]">
+              {s.value}
+            </div>
+            <div class="text-[.82rem] text-white/70 mt-[.15rem]">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

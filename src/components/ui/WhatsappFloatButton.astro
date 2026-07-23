@@ -1,0 +1,17 @@
+---
+import { whatsappNumber } from '@/data/nav';
+
+const defaultMessage = "Bonjour, je souhaite avoir plus d'informations sur vos prestations.";
+const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(defaultMessage)}`;
+---
+<a
+  href={whatsappUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Nous contacter sur WhatsApp"
+  class="whatsapp-pulse fixed bottom-[1.3rem] right-[1.3rem] z-[80] w-14 h-14 rounded-full flex items-center justify-center bg-[#25d366] shadow-[0_8px_24px_-6px_rgba(0,0,0,.5)] transition-transform hover:scale-105"
+>
+  <svg viewBox="0 0 32 32" width="28" height="28" fill="#fff" aria-hidden="true">
+    <path d="M16.001 3C9.376 3 4 8.376 4 15c0 2.34.678 4.523 1.853 6.362L4 29l7.83-1.815A11.94 11.94 0 0 0 16.001 27C22.626 27 28 21.624 28 15S22.626 3 16.001 3Zm6.995 16.6c-.29.82-1.687 1.57-2.325 1.667-.594.09-1.345.128-2.17-.137-.5-.16-1.144-.373-1.97-.73-3.47-1.498-5.735-4.99-5.91-5.226-.174-.235-1.423-1.89-1.423-3.605 0-1.716.9-2.56 1.22-2.91.32-.35.696-.437.928-.437.232 0 .464.002.667.012.214.01.502-.081.784.6.29.7.984 2.404 1.07 2.578.087.174.145.377.029.61-.116.232-.174.377-.348.58-.174.203-.366.454-.522.61-.174.174-.355.363-.153.712.203.35.9 1.484 1.933 2.404 1.328 1.184 2.448 1.55 2.802 1.724.354.174.56.145.767-.087.207-.232.885-1.03 1.122-1.383.238-.354.475-.29.803-.174.328.116 2.077.98 2.433 1.157.355.174.593.261.68.406.087.145.087.842-.203 1.662Z"/>
+  </svg>
+</a>

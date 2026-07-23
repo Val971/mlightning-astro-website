@@ -1,0 +1,181 @@
+---
+import { phoneHref } from '@/data/nav';
+import { socials } from '@/data/socials';
+import { prestationOptions } from '@/data/socials';
+
+export type Props = {
+  title?: string;
+  description?: string;
+  defaultPrestation?: string;
+};
+
+const {
+  title = 'Parlons de votre projet',
+  description = "Un devis gratuit, des conseils personnalisés. On répond généralement sous 24h.",
+  defaultPrestation,
+} = Astro.props;
+---
+<section id="contact" class="max-w-content mx-auto px-6 pt-[clamp(3rem,6vw,5rem)] pb-[clamp(4rem,7vw,7rem)]">
+  <div class="reveal">
+    <div
+      class="relative overflow-hidden rounded-card-lg border border-white/[.12] max-[640px]:p-6 p-[clamp(2.5rem,5vw,4.5rem)]"
+      style="background: linear-gradient(135deg, rgba(120,160,255,.14), rgba(255,150,220,.12));"
+    >
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background: radial-gradient(circle at 80% 20%, rgba(183,166,255,.25), transparent 55%);"
+      ></div>
+
+      <div class="relative grid grid-cols-1 min-[901px]:grid-cols-2 gap-10 items-center">
+        <div>
+          <h2 class="text-[clamp(2.1rem,4.6vw,3.6rem)] tracking-[-.01em]">{title}</h2>
+          <p class="text-white/[.78] mt-[1.1rem] leading-[1.6] max-w-[42ch]">{description}</p>
+          <div class="flex flex-wrap gap-[.9rem] mt-8 items-center">
+            <a href={phoneHref} class="btn-holo">📞 +33 7 56 94 66 84</a>
+            <div class="flex gap-[.6rem]">
+              {socials.map((social) => (
+                <a
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  class="w-12 h-12 rounded-full inline-flex items-center justify-center border border-white/20 bg-white/[.06] transition-colors hover:bg-white/[.12] hover:border-white/[.35]"
+                >
+                  <img src={social.icon} alt={social.name} width="24" height="24" class="w-6 h-6 object-contain" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <p class="flex items-center gap-[.5rem] text-white/60 text-[.88rem] mt-5">
+            <span aria-hidden="true">✈️</span>
+            Client en Guadeloupe ? Nous nous déplaçons ponctuellement sur place, sans problème — parlez-nous de votre projet.
+          </p>
+        </div>
+
+        <div class="bg-[rgba(7,7,12,.55)] backdrop-blur-[6px] border border-white/[.12] rounded-2xl p-4 sm:p-8">
+          <div data-contact-form-wrapper>
+            <form data-contact-form class="flex flex-col gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input required name="name" placeholder="Nom" class="glass-input" />
+                <input required name="phone" placeholder="Téléphone" class="glass-input" />
+              </div>
+              <input name="vehicle" placeholder="Modèle du véhicule (ex. Golf 8)" class="glass-input" />
+              <select name="prestation" class="glass-input">
+                {prestationOptions.map((option) => (
+                  <option value={option} selected={option === (defaultPrestation ?? prestationOptions[0])}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <textarea name="message" rows="3" placeholder="Décrivez votre projet…" class="glass-input resize-y"></textarea>
+
+              <p data-contact-error class="hidden text-[.85rem] text-[#ffb4b4]">
+                L'envoi par email a échoué. Réessayez, ou envoyez votre demande via WhatsApp ci-dessous.
+              </p>
+
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  data-contact-submit
+                  class="btn-holo justify-center flex-1 min-w-0 max-w-full overflow-hidden text-ellipsis disabled:opacity-60 disabled:cursor-wait"
+                >
+                  📧 Envoyer par email
+                </button>
+                <button type="button" data-contact-whatsapp class="btn-outline justify-center flex-1 min-w-0 max-w-full overflow-hidden text-ellipsis">
+                  💬 Envoyer sur WhatsApp
+                </button>
+              </div>
+            </form>
+
+            <div data-contact-success class="hidden text-center py-6">
+              <div
+                class="w-[60px] h-[60px] rounded-full mx-auto mb-[1.1rem] flex items-center justify-center text-[1.6rem] text-bg"
+                style="background-image: linear-gradient(115deg,#a0f0ff,#b7a6ff,#ff9ecb,#ffd39e);"
+              >✓</div>
+              <h3 class="text-[1.5rem]">C'est envoyé !</h3>
+              <p data-contact-success-text class="text-white/[.65] mt-[.6rem] leading-[1.5]"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Remplace ContactForm.tsx : envoi par email via /api/contact (MailerSend),
+  // ou solution de repli WhatsApp (wa.me avec message pré-rempli).
+  const WHATSAPP_NUMBER = '33756946684';
+
+  document.querySelectorAll<HTMLElement>('[data-contact-form-wrapper]').forEach((wrapper) => {
+    const form = wrapper.querySelector<HTMLFormElement>('[data-contact-form]');
+    const successBlock = wrapper.querySelector<HTMLElement>('[data-contact-success]');
+    const successText = wrapper.querySelector<HTMLElement>('[data-contact-success-text]');
+    const errorMsg = wrapper.querySelector<HTMLElement>('[data-contact-error]');
+    const submitBtn = wrapper.querySelector<HTMLButtonElement>('[data-contact-submit]');
+    const whatsappBtn = wrapper.querySelector<HTMLButtonElement>('[data-contact-whatsapp]');
+    if (!form) return;
+
+    function readFields() {
+      const data = new FormData(form!);
+      return {
+        name: (data.get('name')?.toString() ?? '').trim(),
+        phone: (data.get('phone')?.toString() ?? '').trim(),
+        vehicle: (data.get('vehicle')?.toString() ?? '').trim(),
+        prestation: (data.get('prestation')?.toString() ?? '').trim(),
+        message: (data.get('message')?.toString() ?? '').trim(),
+      };
+    }
+
+    function showSuccess(viaEmail: boolean) {
+      form!.classList.add('hidden');
+      successBlock?.classList.remove('hidden');
+      if (successText) {
+        successText.textContent = viaEmail
+          ? 'Votre demande a bien été envoyée par email — on vous répond rapidement.'
+          : "Un onglet WhatsApp vient de s'ouvrir avec votre message pré-rempli — il ne reste plus qu'à l'envoyer.";
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fields = readFields();
+      errorMsg?.classList.add('hidden');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Envoi en cours…';
+      }
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fields),
+        });
+        if (!res.ok) throw new Error('send failed');
+        showSuccess(true);
+      } catch {
+        errorMsg?.classList.remove('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '📧 Envoyer par email';
+        }
+      }
+    });
+
+    whatsappBtn?.addEventListener('click', () => {
+      const { name, phone, vehicle, prestation, message } = readFields();
+      const lines = [
+        `Bonjour, je souhaite un devis pour : ${prestation}`,
+        `Nom : ${name}`,
+        `Téléphone : ${phone}`,
+        vehicle && `Véhicule : ${vehicle}`,
+        message && `Projet : ${message}`,
+      ].filter(Boolean);
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      showSuccess(false);
+    });
+  });
+</script>
