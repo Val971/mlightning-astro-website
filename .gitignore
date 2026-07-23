@@ -2,6 +2,7 @@
 dist/
 .output/
 .astro/
+.vercel/
 
 # dépendances
 node_modules/
