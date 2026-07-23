@@ -38,7 +38,9 @@ const ogImageUrl = new URL(ogImage, siteUrl).toString();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalUrl} />
 
     <title>{pageTitle}</title>
